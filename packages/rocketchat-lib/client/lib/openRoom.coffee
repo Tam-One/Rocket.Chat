@@ -1,12 +1,15 @@
 currentTracker = undefined
 
-@openRoom = (type, name) ->
+@openRoom = (type, name, hideNav) ->
 	Session.set 'openedRoom', null
 
 	Meteor.defer ->
 		currentTracker = Tracker.autorun (c) ->
 			if RoomManager.open(type + name).ready() isnt true
-				BlazeLayout.render 'main', {center: 'loading'}
+				if hideNav is true
+				  BlazeLayout.render 'mainNoSidenav', {center: 'loading'}
+				else
+          BlazeLayout.render 'main', {center: 'loading'}
 				return
 
 			username = Meteor.user()?.username
@@ -40,7 +43,7 @@ currentTracker = undefined
 					BlazeLayout.render 'main', {center: 'roomNotFound'}
 				return
 
-			$('.rocket-loader').remove();
+			$('.page-loading').remove();
 			mainNode = document.querySelector('.main-content')
 			if mainNode?
 				for child in mainNode.children

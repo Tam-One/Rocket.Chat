@@ -1,0 +1,12 @@
+.main-content {
+    left: 0;
+}
+
+@media (max-width: 780px) {
+    #rocket-chat .burger {
+        display: none;
+    }
+    #rocket-chat .fixed-title h2 {
+        margin-left: 0;
+    }
+}

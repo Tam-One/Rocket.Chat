@@ -18,6 +18,48 @@ Api.addRoute 'publicRooms', authRequired: true,
 		rooms = RocketChat.models.Rooms.findByType('c', { sort: { msgs:-1 } }).fetch()
 		status: 'success', rooms: rooms
 
+
+# custom Api routes
+
+# find private rooms by username
+Api.addRoute 'rooms/find/direct/:username', authRequired: true,
+  get: ->
+    Meteor.runAsUser this.userId, () =>
+    rooms = RocketChat.models.Rooms.findByTypeContainigUsername('d', @urlParams.username).fetch()
+    status: 'success', rooms: rooms
+
+# create a DirectMessage room
+Api.addRoute 'rooms/create/direct/:username', authRequired: true,
+  post: ->
+    Meteor.runAsUser this.userId, () =>
+      room = Meteor.call('createDirectMessage', @urlParams.username)
+      status: 'success', rid: room.rid   # need to handle error
+
+# add new user
+Api.addRoute 'user/add', authRequired: true,
+  post:
+    action: ->
+      if RocketChat.authz.hasPermission(@userId, 'add-user')
+        try
+          userObj = { name: @bodyParams.name, email: @bodyParams.email, pass: @bodyParams.pass }
+          Api.testapiValidateUsers  [userObj]
+          this.response.setTimeout (500)
+          id = {uid: Meteor.call 'registerUser', userObj}
+          Meteor.runAsUser id.uid, () =>
+              Meteor.call 'setUsername', userObj.name
+
+          status: 'success', id: id
+        catch e
+          statusCode: 400    # bad request or other errors
+          body: status: 'fail', message: e.name + ' :: ' + e.message
+      else
+        statusCode: 403
+        body: status: 'error', message: 'You do not have permission to do this'
+
+
+# end custom Api routes
+
+
 # join a room
 Api.addRoute 'rooms/:id/join', authRequired: true,
 	post: ->
