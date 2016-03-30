@@ -34,40 +34,46 @@ RocketChat.settings.addGroup 'Accounts', ->
 RocketChat.settings.addGroup 'OAuth', ->
 
 	@section 'Facebook', ->
+		enableQuery = { _id: 'Accounts_OAuth_Facebook', value: true }
 		@add 'Accounts_OAuth_Facebook', false, { type: 'boolean', public: true }
-		@add 'Accounts_OAuth_Facebook_id', '', { type: 'string', enableQuery: {_id: 'Accounts_OAuth_Facebook', value: true} }
-		@add 'Accounts_OAuth_Facebook_secret', '', { type: 'string', enableQuery: {_id: 'Accounts_OAuth_Facebook', value: true} }
-		@add 'Accounts_OAuth_Facebook_callback_url', __meteor_runtime_config__?.ROOT_URL + '_oauth/facebook', { type: 'string', blocked: true }
+		@add 'Accounts_OAuth_Facebook_id', '', { type: 'string', enableQuery: enableQuery }
+		@add 'Accounts_OAuth_Facebook_secret', '', { type: 'string', enableQuery: enableQuery }
+		@add 'Accounts_OAuth_Facebook_callback_url', '_oauth/facebook', { type: 'relativeUrl', readonly: true, force: true, enableQuery: enableQuery }
 
 	@section 'Google', ->
+		enableQuery = { _id: 'Accounts_OAuth_Google', value: true }
 		@add 'Accounts_OAuth_Google', false, { type: 'boolean', public: true }
-		@add 'Accounts_OAuth_Google_id', '', { type: 'string', enableQuery: {_id: 'Accounts_OAuth_Google', value: true} }
-		@add 'Accounts_OAuth_Google_secret', '', { type: 'string', enableQuery: {_id: 'Accounts_OAuth_Google', value: true} }
-		@add 'Accounts_OAuth_Google_callback_url', __meteor_runtime_config__?.ROOT_URL + '_oauth/google', { type: 'string', blocked: true }
+		@add 'Accounts_OAuth_Google_id', '', { type: 'string', enableQuery: enableQuery }
+		@add 'Accounts_OAuth_Google_secret', '', { type: 'string', enableQuery: enableQuery }
+		@add 'Accounts_OAuth_Google_callback_url', '_oauth/google', { type: 'relativeUrl', readonly: true, force: true, enableQuery: enableQuery }
 
 	@section 'GitHub', ->
+		enableQuery = { _id: 'Accounts_OAuth_Github', value: true }
 		@add 'Accounts_OAuth_Github', false, { type: 'boolean', public: true }
-		@add 'Accounts_OAuth_Github_id', '', { type: 'string', enableQuery: {_id: 'Accounts_OAuth_Github', value: true} }
-		@add 'Accounts_OAuth_Github_secret', '', { type: 'string', enableQuery: {_id: 'Accounts_OAuth_Github', value: true} }
-		@add 'Accounts_OAuth_Github_callback_url', __meteor_runtime_config__?.ROOT_URL + '_oauth/github', { type: 'string', blocked: true }
+		@add 'Accounts_OAuth_Github_id', '', { type: 'string', enableQuery: enableQuery }
+		@add 'Accounts_OAuth_Github_secret', '', { type: 'string', enableQuery: enableQuery }
+		@add 'Accounts_OAuth_Github_callback_url', '_oauth/github', { type: 'relativeUrl', readonly: true, force: true, enableQuery: enableQuery }
 
 	@section 'Linkedin', ->
+		enableQuery = { _id: 'Accounts_OAuth_Linkedin', value: true }
 		@add 'Accounts_OAuth_Linkedin', false, { type: 'boolean', public: true }
-		@add 'Accounts_OAuth_Linkedin_id', '', { type: 'string', enableQuery: {_id: 'Accounts_OAuth_Linkedin', value: true} }
-		@add 'Accounts_OAuth_Linkedin_secret', '', { type: 'string', enableQuery: {_id: 'Accounts_OAuth_Linkedin', value: true} }
-		@add 'Accounts_OAuth_Linkedin_callback_url', __meteor_runtime_config__?.ROOT_URL + '_oauth/linkedin', { type: 'string', blocked: true }
+		@add 'Accounts_OAuth_Linkedin_id', '', { type: 'string', enableQuery: enableQuery }
+		@add 'Accounts_OAuth_Linkedin_secret', '', { type: 'string', enableQuery: enableQuery }
+		@add 'Accounts_OAuth_Linkedin_callback_url', '_oauth/linkedin', { type: 'relativeUrl', readonly: true, force: true, enableQuery: enableQuery }
 
 	@section 'Meteor', ->
+		enableQuery = { _id: 'Accounts_OAuth_Meteor', value: true }
 		@add 'Accounts_OAuth_Meteor', false, { type: 'boolean', public: true }
-		@add 'Accounts_OAuth_Meteor_id', '', { type: 'string', enableQuery: {_id: 'Accounts_OAuth_Meteor', value: true} }
-		@add 'Accounts_OAuth_Meteor_secret', '', { type: 'string', enableQuery: {_id: 'Accounts_OAuth_Meteor', value: true} }
-		@add 'Accounts_OAuth_Meteor_callback_url', __meteor_runtime_config__?.ROOT_URL + '_oauth/meteor', { type: 'string', blocked: true }
+		@add 'Accounts_OAuth_Meteor_id', '', { type: 'string', enableQuery: enableQuery }
+		@add 'Accounts_OAuth_Meteor_secret', '', { type: 'string', enableQuery: enableQuery }
+		@add 'Accounts_OAuth_Meteor_callback_url', '_oauth/meteor', { type: 'relativeUrl', readonly: true, force: true, enableQuery: enableQuery }
 
 	@section 'Twitter', ->
+		enableQuery = { _id: 'Accounts_OAuth_Twitter', value: true }
 		@add 'Accounts_OAuth_Twitter', false, { type: 'boolean', public: true }
-		@add 'Accounts_OAuth_Twitter_id', '', { type: 'string', enableQuery: {_id: 'Accounts_OAuth_Twitter', value: true} }
-		@add 'Accounts_OAuth_Twitter_secret', '', { type: 'string', enableQuery: {_id: 'Accounts_OAuth_Twitter', value: true} }
-		@add 'Accounts_OAuth_Twitter_callback_url', __meteor_runtime_config__?.ROOT_URL + '_oauth/twitter', { type: 'string', blocked: true }
+		@add 'Accounts_OAuth_Twitter_id', '', { type: 'string', enableQuery: enableQuery }
+		@add 'Accounts_OAuth_Twitter_secret', '', { type: 'string', enableQuery: enableQuery }
+		@add 'Accounts_OAuth_Twitter_callback_url', '_oauth/twitter', { type: 'relativeUrl', readonly: true, force: true, enableQuery: enableQuery }
 
 
 RocketChat.settings.addGroup 'General', ->
@@ -158,7 +164,7 @@ RocketChat.settings.addGroup 'Layout', ->
 		@add 'Layout_Home_Body', 'Welcome to Rocket.Chat <br> Go to APP SETTINGS -> Layout to customize this intro.', { type: 'code', code: 'text/html', multiline: true, public: true }
 		@add 'Layout_Terms_of_Service', 'Terms of Service <br> Go to APP SETTINGS -> Layout to customize this page.', { type: 'code', code: 'text/html', multiline: true, public: true }
 		@add 'Layout_Privacy_Policy', 'Privacy Policy <br> Go to APP SETTINGS -> Layout to customize this page.', { type: 'code', code: 'text/html', multiline: true, public: true }
-		@add 'Layout_Sidenav_Footer', '<div><a href="https://github.com/RocketChat/Rocket.Chat" class="logo" target="_blank"> <img src="/images/logo/logo.svg?v=3" /></a><div class="github-tagline"><span class="octicon octicon-pencil" style="color: #994C00"></span> with <span class="octicon octicon-heart" style="color: red"></span> on <span class="octicon octicon-mark-github"></span></div></div>', { type: 'code', code: 'text/html', public: true, i18nDescription: 'Layout_Sidenav_Footer_description' }
+		@add 'Layout_Sidenav_Footer', '<div><a href="https://github.com/RocketChat/Rocket.Chat" class="logo" target="_blank"> <img src="/images/logo/logo.svg?v=3" /></a><div class="github-tagline"><span class="icon-pencil" style="color: #994C00"></span> with <span class="icon-heart" style="color: red"></span> on <span class="icon-github-circled"></span></div></div>', { type: 'code', code: 'text/html', public: true, i18nDescription: 'Layout_Sidenav_Footer_description' }
 
 	@section 'Custom Scripts', ->
 		@add 'Custom_Script_Logged_Out', '//Add your script', { type: 'code', multiline: true, public: true }

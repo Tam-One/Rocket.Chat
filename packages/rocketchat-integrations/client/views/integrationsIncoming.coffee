@@ -109,13 +109,16 @@ Template.integrationsIncoming.helpers
 
 Template.integrationsIncoming.events
 	"blur input": (e, t) ->
-		t.record.set
-			name: $('[name=name]').val().trim()
-			alias: $('[name=alias]').val().trim()
-			emoji: $('[name=emoji]').val().trim()
-			avatar: $('[name=avatar]').val().trim()
-			channel: $('[name=channel]').val().trim()
-			username: $('[name=username]').val().trim()
+		value = t.record.curValue or {}
+
+		value.name = $('[name=name]').val().trim()
+		value.alias = $('[name=alias]').val().trim()
+		value.emoji = $('[name=emoji]').val().trim()
+		value.avatar = $('[name=avatar]').val().trim()
+		value.channel = $('[name=channel]').val().trim()
+		value.username = $('[name=username]').val().trim()
+
+		t.record.set value
 
 	"click .submit > .delete": ->
 		params = Template.instance().data.params()
@@ -142,12 +145,12 @@ Template.integrationsIncoming.events
 				FlowRouter.go "admin-integrations"
 
 	"click .button-fullscreen": ->
-		codeMirrorBox = $('.code-mirror-box[data-editor-id="'+this._id+'"]')
+		codeMirrorBox = $('.code-mirror-box')
 		codeMirrorBox.addClass('code-mirror-box-fullscreen')
 		codeMirrorBox.find('.CodeMirror')[0].CodeMirror.refresh()
 
 	"click .button-restore": ->
-		codeMirrorBox = $('.code-mirror-box[data-editor-id="'+this._id+'"]')
+		codeMirrorBox = $('.code-mirror-box')
 		codeMirrorBox.removeClass('code-mirror-box-fullscreen')
 		codeMirrorBox.find('.CodeMirror')[0].CodeMirror.refresh()
 
