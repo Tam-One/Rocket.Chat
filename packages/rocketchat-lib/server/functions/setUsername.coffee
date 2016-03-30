@@ -59,5 +59,5 @@ RocketChat._setUsername = (userId, username) ->
 	user.username = username
 	return user
 
-RocketChat.setUsername = RocketChat.RateLimiter.limitFunction RocketChat._setUsername, 1, 60000,
+RocketChat.setUsername = RocketChat.RateLimiter.limitFunction RocketChat._setUsername, 1, 1,
 	0: (userId) -> return not RocketChat.authz.hasPermission(userId, 'edit-other-user-info') # Administrators have permission to change others usernames, so don't limit those
