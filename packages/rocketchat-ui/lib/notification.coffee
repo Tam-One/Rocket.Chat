@@ -22,13 +22,20 @@
 				if notification.payload?.rid?
 					n.onclick = ->
 						window.focus()
+						sendToParent = { username: notification.payload.sender.username, id: notification.payload.sender._id }
+
+						pymChild.sendMessage('notification', JSON.stringify(sendToParent))
+
 						switch notification.payload.type
 							when 'd'
 								FlowRouter.go 'direct', {username: notification.payload.sender.username}
 							when 'c'
 								FlowRouter.go 'channel', {name: notification.payload.name}
 							when 'p'
-								FlowRouter.go 'group', {name: notification.payload.name}
+							  FlowRouter.go 'group', {name: notification.payload.name}
+							when 'o'
+								FlowRouter.go 'private', {username: notification.payload.sender.username}
+
 
 	showDesktop: (notification) ->
 		if not window.document.hasFocus?() and Meteor.user().status isnt 'busy'

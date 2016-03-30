@@ -35,4 +35,5 @@ Package.onUse(function(api) {
 
 	api.addFiles('server/inject.js', 'server');
 	api.addFiles('server/fastRender.js', 'server');
+	api.addFiles('client/pym.js', 'client');
 });

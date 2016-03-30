@@ -9,7 +9,7 @@ Meteor.startup ->
 
 		openedRoomId = undefined
 		Tracker.nonreactive ->
-			if FlowRouter.getRouteName() in ['channel', 'group', 'direct']
+			if FlowRouter.getRouteName() in ['channel', 'group', 'direct', 'private']
 				openedRoomId = Session.get 'openedRoom'
 
 		for subscription in subscriptions.fetch()

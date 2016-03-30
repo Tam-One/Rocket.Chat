@@ -8,4 +8,6 @@ Template.adminUserChannels.helpers
 			when 'p'
 				FlowRouter.path('group', {name: @name})
 			when 'c'
-				FlowRouter.path('channel', {name: @name})
+			  FlowRouter.path('channel', {name: @name})
+			when 'o'
+				FlowRouter.path('private', {name: @name})

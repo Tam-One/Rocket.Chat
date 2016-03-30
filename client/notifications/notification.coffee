@@ -11,7 +11,9 @@ Meteor.startup ->
 			RocketChat.Notifications.onUser 'notification', (notification) ->
 
 				openedRoomId = undefined
-				if FlowRouter.getRouteName() in ['channel', 'group', 'direct']
+				if FlowRouter.getRouteName() is 'private'
+          notification.payload.type = 'o'
+				if FlowRouter.getRouteName() in ['channel', 'group', 'direct', 'private']
 					openedRoomId = Session.get 'openedRoom'
 
 				# This logic is duplicated in /client/startup/unread.coffee.

@@ -6,6 +6,7 @@ Meteor.startup ->
 	Meteor.subscribe("activeUsers")
 
 	Session.setDefault('AvatarRandom', 0)
+	window.pymChild = new pym.Child()
 
 	window.lastMessageWindow = {}
 	window.lastMessageWindowHistory = {}
