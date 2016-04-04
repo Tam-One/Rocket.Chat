@@ -25,16 +25,17 @@
 						sendToParent = { username: notification.payload.sender.username, id: notification.payload.sender._id }
 
 						pymChild.sendMessage('notification', JSON.stringify(sendToParent))
+						n.close()
 
 						switch notification.payload.type
-#							when 'd'
-#								FlowRouter.go 'direct', {username: notification.payload.sender.username}
+							when 'd'
+								FlowRouter.go 'direct', {username: notification.payload.sender.username}
 							when 'c'
 								FlowRouter.go 'channel', {name: notification.payload.name}
 							when 'p'
 							  FlowRouter.go 'group', {name: notification.payload.name}
-#							when 'o'
-#								FlowRouter.go 'private', {username: notification.payload.sender.username}
+							when 'o'
+								FlowRouter.go 'private', {username: notification.payload.sender.username}
 
 
 	showDesktop: (notification) ->
