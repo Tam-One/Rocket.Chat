@@ -15,8 +15,10 @@ Meteor.startup ->
 	  document.cookie = 'meteor_login_token=' + user.authToken
 	  document.cookie = 'rc_token=' + user.authToken
 	  document.cookie = 'rc_uid=' + user._id
-	  pymChild.sendMessage('childLoggedIn', 'login ready')
 
+	Tracker.autorun ->
+    if Meteor.userId()
+      pymChild.sendMessage('childLoggedIn', 'login ready')
 
 	pymChild.onMessage 'loadRoom', (username) ->
     FlowRouter.go 'private', {username: username}
