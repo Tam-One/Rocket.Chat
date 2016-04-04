@@ -1,7 +1,7 @@
 @roomExit = ->
 	RocketChat.callbacks.run 'roomExit'
 
-	BlazeLayout.render 'main', {center: 'none'}
+	BlazeLayout.render 'mainNoSidenav', {center: 'none'}
 
 	if currentTracker?
 		currentTracker.stop()

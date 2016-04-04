@@ -17,7 +17,7 @@ RocketChat.roomTypes.add 'c', 10,
 	condition: ->
 		return RocketChat.authz.hasAllPermission 'view-c-room'
 
-RocketChat.roomTypes.add 'd', 20,
+RocketChat.roomTypes.add 'd', 40,
 	template: 'directMessages'
 	icon: 'icon-at'
 	route:
@@ -32,7 +32,7 @@ RocketChat.roomTypes.add 'd', 20,
 	condition: ->
 		return RocketChat.authz.hasAllPermission 'view-d-room'
 
-RocketChat.roomTypes.add 'o', 40,
+RocketChat.roomTypes.add 'o', 20,
   template: 'directMessages'
   icon: 'icon-at'
   route:
