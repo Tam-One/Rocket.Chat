@@ -44,10 +44,7 @@ Api.addRoute 'users/find/:username', authRequired: true,
     if RocketChat.authz.hasPermission( @userId, 'view-full-other-user-info') is true
       Meteor.runAsUser this.userId, () =>
         user = RocketChat.models.Users.findOneByUsername @urlParams.username
-        if user
-          status: 'success', user: user
-        else
-          status: 'fail', message: 'Failed to find user by username'
+        status: 'success', user: user || false
     else
       statusCode: 403
       body: status: 'error', message: 'You do not have permission to do this'
@@ -59,10 +56,7 @@ Api.addRoute 'users/get/:id', authRequired: true,
     if RocketChat.authz.hasPermission( @userId, 'view-full-other-user-info') is true
       Meteor.runAsUser this.userId, () =>
         user = RocketChat.models.Users.findOneById @urlParams.id
-        if user
-          status: 'success', user: user
-        else
-          status: 'fail', message: 'Failed to find user by id'
+        status: 'success', user: user || false
     else
       statusCode: 403
       body: status: 'error', message: 'You do not have permission to do this'
@@ -82,7 +76,9 @@ Api.addRoute 'users/create', authRequired: true,
           Meteor.runAsUser id.uid, () =>
             Meteor.call 'setUsername', @bodyParams.username
 
-          status: 'success', id: id
+          user = RocketChat.models.Users.findOneById id.uid
+
+          status: 'success', user: user
         catch e
           statusCode: 400    # bad request or other errors
           body: status: 'fail', message: e.name + ' :: ' + e.message
@@ -110,9 +106,9 @@ Api.addRoute 'users/update/:id', authRequired: true,
           if @bodyParams.pass and @bodyParams.pass.trim() and canEditUserPassword
             Accounts.setPassword @urlParams.id, @bodyParams.pass.trim()
 
-          userObj = RocketChat.models.Users.findOneById @urlParams.id
+          user = RocketChat.models.Users.findOneById @urlParams.id
 
-          status: 'success', user: userObj
+          status: 'success', user: user
         catch e
           statusCode: 400
           body: status: 'fail', message: e.name + ' :: ' + e.message
