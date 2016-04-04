@@ -6,7 +6,22 @@ Meteor.startup ->
 	Meteor.subscribe("activeUsers")
 
 	Session.setDefault('AvatarRandom', 0)
-	window.pymChild = new pym.Child()
+	window.pymChild = new pym.Child({ id: 'chatapp-iframe-container'})
+	pymChild.onMessage 'loginUser', (user) ->
+	  user = JSON.parse(user)
+	  localStorage.setItem('Meteor.loginToken', user.authToken)
+	  localStorage.setItem('Meteor.loginTokenExpires', moment().add(1, 'months'))
+	  localStorage.setItem('Meteor.userId', user._id)
+	  document.cookie = 'meteor_login_token=' + user.authToken
+	  document.cookie = 'rc_token=' + user.authToken
+	  document.cookie = 'rc_uid=' + user._id
+	  pymChild.sendMessage('childLoggedIn', 'login ready')
+
+
+	pymChild.onMessage 'loadRoom', (username) ->
+    FlowRouter.go 'private', {username: username}
+
+	pymChild.sendMessage('childLoaded', 'ready')
 
 	window.lastMessageWindow = {}
 	window.lastMessageWindowHistory = {}
