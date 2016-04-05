@@ -14,7 +14,7 @@ Meteor.methods
 
 		RocketChat.models.Users.setName userId, formData.name
 
-		if userData.email
-			Accounts.sendVerificationEmail(userId, userData.email);
+#		if userData.email
+#			Accounts.sendVerificationEmail(userId, userData.email);
 
 		return userId
