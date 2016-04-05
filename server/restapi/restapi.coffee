@@ -76,6 +76,9 @@ Api.addRoute 'users/create', authRequired: true,
           Meteor.runAsUser id.uid, () =>
             Meteor.call 'setUsername', @bodyParams.username
 
+          Meteor.runAsUser this.userId, () =>
+            RocketChat.models.Users.setEmailVerified id.uid, @bodyParams.email
+
           user = RocketChat.models.Users.findOneById id.uid
 
           status: 'success', user: user
