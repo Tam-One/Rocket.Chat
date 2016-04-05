@@ -1,6 +1,5 @@
 sizeOf = Npm.require 'image-size'
 mime = Npm.require 'mime-types'
-crypto = Npm.require 'crypto'
 
 mime.extensions['image/vnd.microsoft.icon'] = ['ico']
 
@@ -10,64 +9,64 @@ mime.extensions['image/vnd.microsoft.icon'] = ['ico']
 
 assets =
 	'logo':
-		label: 'logo (svg, png, jpg)'
-		defaultUrl: 'images/logo/logo.svg'
+		label: 'logo (svg, png)'
+		defaultUrl: 'images/logo/logo.svg?v=3'
 		constraints:
 			type: 'image'
-			extensions: ['svg', 'png', 'jpg', 'jpeg']
+			extensions: ['svg', 'png']
 			width: undefined
 			height: undefined
-	'favicon':
+	'favicon.ico':
 		label: 'favicon.ico'
-		defaultUrl: 'favicon.ico'
+		defaultUrl: 'favicon.ico?v=3'
 		constraints:
 			type: 'image'
 			extensions: ['ico']
 			width: undefined
 			height: undefined
-	'favicon':
+	'favicon.svg':
 		label: 'favicon.svg'
-		defaultUrl: 'images/logo/icon.svg'
+		defaultUrl: 'images/logo/icon.svg?v=3'
 		constraints:
 			type: 'image'
 			extensions: ['svg']
 			width: undefined
 			height: undefined
-	'favicon_64':
+	'favicon_64.png':
 		label: 'favicon.png (64x64)'
-		defaultUrl: 'images/logo/favicon-64x64.png'
+		defaultUrl: 'images/logo/favicon-64x64.png?v=3'
 		constraints:
 			type: 'image'
 			extensions: ['png']
 			width: 64
 			height: 64
-	'favicon_96':
+	'favicon_96.png':
 		label: 'favicon.png (96x96)'
-		defaultUrl: 'images/logo/favicon-96x96.png'
+		defaultUrl: 'images/logo/favicon-96x96.png?v=3'
 		constraints:
 			type: 'image'
 			extensions: ['png']
 			width: 96
 			height: 96
-	'favicon_128':
+	'favicon_128.png':
 		label: 'favicon.png (128x128)'
-		defaultUrl: 'images/logo/favicon-128x128.png'
+		defaultUrl: 'images/logo/favicon-128x128.png?v=3'
 		constraints:
 			type: 'image'
 			extensions: ['png']
 			width: 128
 			height: 128
-	'favicon_192':
+	'favicon_192.png':
 		label: 'favicon.png (192x192)'
-		defaultUrl: 'images/logo/android-chrome-192x192.png'
+		defaultUrl: 'images/logo/android-chrome-192x192.png?v=3'
 		constraints:
 			type: 'image'
 			extensions: ['png']
 			width: 192
 			height: 192
-	'favicon_256':
+	'favicon_256.png':
 		label: 'favicon.png (256x256)'
-		defaultUrl: 'images/logo/favicon-256x256.png'
+		defaultUrl: 'images/logo/favicon-256x256.png?v=3'
 		constraints:
 			type: 'image'
 			extensions: ['png']
@@ -75,16 +74,44 @@ assets =
 			height: 256
 
 
-RocketChat.Assets = new class
-	setAsset: (binaryContent, contentType, asset) ->
+RocketChat.settings.addGroup 'Assets'
+for key, value of assets
+	RocketChat.settings.add "Assets_#{key}", '', { type: 'asset', group: 'Assets', fileConstraints: value.constraints, i18nLabel: value.label, asset: key }
+
+
+Meteor.methods
+	unsetAsset: (asset) ->
+		unless Meteor.userId()
+			throw new Meteor.Error 'invalid-user', "[methods] unsetAsset -> Invalid user"
+
+		hasPermission = RocketChat.authz.hasPermission Meteor.userId(), 'manage-assets'
+		unless hasPermission
+			throw new Meteor.Error 'manage-assets-not-allowed', "[methods] unsetAsset -> Manage assets not allowed"
+
 		if not assets[asset]?
 			throw new Meteor.Error "Invalid_asset"
 
-		extension = mime.extension(contentType)
-		if extension not in assets[asset].constraints.extensions
+		RocketChatAssetsInstance.deleteFile asset
+		RocketChat.settings.clearById "Assets_#{asset}"
+
+
+Meteor.methods
+	setAsset: (binaryContent, contentType, asset) ->
+		unless Meteor.userId()
+			throw new Meteor.Error 'invalid-user', "[methods] setAsset -> Invalid user"
+
+		hasPermission = RocketChat.authz.hasPermission Meteor.userId(), 'manage-assets'
+		unless hasPermission
+			throw new Meteor.Error 'manage-assets-not-allowed', "[methods] unsetAsset -> Manage assets not allowed"
+
+		if not assets[asset]?
+			throw new Meteor.Error "Invalid_asset"
+
+		if mime.extension(contentType) not in assets[asset].constraints.extensions
 			throw new Meteor.Error "Invalid_file_type", contentType
 
 		file = new Buffer(binaryContent, 'binary')
+
 		if assets[asset].constraints.width? or assets[asset].constraints.height?
 			dimensions = sizeOf file
 
@@ -99,168 +126,28 @@ RocketChat.Assets = new class
 		ws = RocketChatAssetsInstance.createWriteStream asset, contentType
 		ws.on 'end', Meteor.bindEnvironment ->
 			Meteor.setTimeout ->
-				RocketChat.settings.updateById "Assets_#{asset}", {
-					url: "/assets/#{asset}.#{extension}"
-					defaultUrl: assets[asset].defaultUrl
-				}
+				RocketChat.settings.updateById "Assets_#{asset}", "/assets/#{asset}"
 			, 200
 
 		rs.pipe ws
 		return
 
-	unsetAsset: (asset) ->
-		if not assets[asset]?
-			throw new Meteor.Error "Invalid_asset"
-
-		RocketChatAssetsInstance.deleteFile asset
-
-		RocketChat.settings.updateById "Assets_#{asset}", {defaultUrl: assets[asset].defaultUrl}
-		return
-
-	refreshClients: ->
-		process.emit('message', {refresh: 'client'})
-
-
-RocketChat.settings.addGroup 'Assets'
-for key, value of assets
-	do (key, value) ->
-		RocketChat.settings.add "Assets_#{key}", {defaultUrl: value.defaultUrl}, { type: 'asset', group: 'Assets', fileConstraints: value.constraints, i18nLabel: value.label, asset: key, public: true }
-
-Meteor.startup ->
-	forEachAsset = (key, value) ->
-		RocketChat.settings.get "Assets_#{key}", (settingKey, settingValue) ->
-			if settingValue is undefined
-				value.cache = undefined
-				return
-
-			file = RocketChatAssetsInstance.getFileWithReadStream key
-			if not file
-				value.cache = undefined
-				return
-
-			data = []
-			file.readStream.on 'data', Meteor.bindEnvironment (chunk) ->
-				data.push chunk
-
-			file.readStream.on 'end', Meteor.bindEnvironment ->
-				data = Buffer.concat(data)
-				hash = crypto.createHash('sha1').update(data).digest('hex')
-				extension = settingValue.url.split('.').pop()
-				value.cache =
-					path: "assets/#{key}.#{extension}"
-					cacheable: false
-					sourceMapUrl: undefined
-					where: 'client'
-					type: 'asset'
-					content: data
-					extension: extension
-					url: "/assets/#{key}.#{extension}?#{hash}"
-					size: file.length
-					uploadDate: file.uploadDate
-					contentType: file.contentType
-					hash: hash
-
-
-	forEachAsset(key, value) for key, value of assets
-
-calculateClientHash = WebAppHashing.calculateClientHash
-WebAppHashing.calculateClientHash = (manifest, includeFilter, runtimeConfigOverride) ->
-	for key, value of assets
-		if not value.cache? && not value.defaultUrl?
-			continue
-
-		manifestItem = _.find manifest, (item) ->
-			return item.path is key
-
-		cache = {}
-		if value.cache
-			cache =
-				path: value.cache.path
-				cacheable: value.cache.cacheable
-				sourceMapUrl: value.cache.sourceMapUrl
-				where: value.cache.where
-				type: value.cache.type
-				url: value.cache.url
-				size: value.cache.size
-				hash: value.cache.hash
-
-			WebAppInternals.staticFiles["/__cordova/assets/#{key}"] = value.cache
-			WebAppInternals.staticFiles["/__cordova/assets/#{key}.#{value.cache.extension}"] = value.cache
-		else
-			extension = value.defaultUrl.split('.').pop()
-			cache =
-				path: "assets/#{key}.#{extension}"
-				cacheable: false
-				sourceMapUrl: undefined
-				where: 'client'
-				type: 'asset'
-				url: "/assets/#{key}.#{extension}?v3"
-				# size: value.cache.size
-				hash: 'v3'
-
-			WebAppInternals.staticFiles["/__cordova/assets/#{key}"] = WebAppInternals.staticFiles["/__cordova/#{value.defaultUrl}"]
-			WebAppInternals.staticFiles["/__cordova/assets/#{key}.#{extension}"] = WebAppInternals.staticFiles["/__cordova/#{value.defaultUrl}"]
-
-
-		if manifestItem?
-			index = manifest.indexOf(manifestItem)
-
-			manifest[index] = cache
-		else
-			manifest.push cache
-
-	return calculateClientHash.call this, manifest, includeFilter, runtimeConfigOverride
-
-
-Meteor.methods
-	refreshClients: ->
-		unless Meteor.userId()
-			throw new Meteor.Error 'invalid-user', "[methods] unsetAsset -> Invalid user"
-
-		hasPermission = RocketChat.authz.hasPermission Meteor.userId(), 'manage-assets'
-		unless hasPermission
-			throw new Meteor.Error 'manage-assets-not-allowed', "[methods] unsetAsset -> Manage assets not allowed"
-
-		RocketChat.Assets.refreshClients
-
-
-	unsetAsset: (asset) ->
-		unless Meteor.userId()
-			throw new Meteor.Error 'invalid-user', "[methods] unsetAsset -> Invalid user"
-
-		hasPermission = RocketChat.authz.hasPermission Meteor.userId(), 'manage-assets'
-		unless hasPermission
-			throw new Meteor.Error 'manage-assets-not-allowed', "[methods] unsetAsset -> Manage assets not allowed"
-
-		RocketChat.Assets.unsetAsset asset
-
-
-	setAsset: (binaryContent, contentType, asset) ->
-		unless Meteor.userId()
-			throw new Meteor.Error 'invalid-user', "[methods] setAsset -> Invalid user"
-
-		hasPermission = RocketChat.authz.hasPermission Meteor.userId(), 'manage-assets'
-		unless hasPermission
-			throw new Meteor.Error 'manage-assets-not-allowed', "[methods] unsetAsset -> Manage assets not allowed"
-
-		RocketChat.Assets.setAsset binaryContent, contentType, asset
-		return
-
 
 WebApp.connectHandlers.use '/assets/', Meteor.bindEnvironment (req, res, next) ->
 	params =
-		asset: decodeURIComponent(req.url.replace(/^\//, '').replace(/\?.*$/, '')).replace(/\.[^.]*$/, '')
+		asset: decodeURIComponent(req.url.replace(/^\//, '').replace(/\?.*$/, ''))
 
-	file = assets[params.asset]?.cache
+	file = RocketChatAssetsInstance.getFileWithReadStream params.asset
+
+	# res.setHeader 'Content-Disposition', 'inline'
 
 	if not file?
 		if assets[params.asset]?.defaultUrl?
-			req.url = '/'+assets[params.asset].defaultUrl
-			WebAppInternals.staticFilesMiddleware WebAppInternals.staticFiles, req, res, next
+			res.writeHead 301,
+				Location: Meteor.absoluteUrl(assets[params.asset].defaultUrl)
 		else
 			res.writeHead 404
-			res.end()
-
+		res.end()
 		return
 
 	reqModifiedHeader = req.headers["if-modified-since"];
@@ -275,8 +162,7 @@ WebApp.connectHandlers.use '/assets/', Meteor.bindEnvironment (req, res, next) -
 	res.setHeader 'Expires', '-1'
 	res.setHeader 'Last-Modified', file.uploadDate?.toUTCString() or new Date().toUTCString()
 	res.setHeader 'Content-Type', file.contentType
-	res.setHeader 'Content-Length', file.size
+	res.setHeader 'Content-Length', file.length
 
-	res.writeHead 200
-	res.end(file.content)
+	file.readStream.pipe res
 	return

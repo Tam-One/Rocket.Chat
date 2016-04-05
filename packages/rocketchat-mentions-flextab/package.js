@@ -15,8 +15,6 @@ Package.onUse(function(api) {
 		'rocketchat:lib'
 	]);
 
-	api.use('templating', 'client');
-
 	api.addFiles([
 		'client/lib/MentionedMessage.coffee',
 		'client/views/stylesheets/mentionsFlexTab.less',
@@ -29,4 +27,20 @@ Package.onUse(function(api) {
 	api.addFiles([
 		'server/publications/mentionedMessages.coffee'
 	], 'server');
+
+	// TAPi18n
+	api.use('templating', 'client');
+	var _ = Npm.require('underscore');
+	var fs = Npm.require('fs');
+	tapi18nFiles = _.compact(_.map(fs.readdirSync('packages/rocketchat-mentions-flextab/i18n'), function(filename) {
+		if (fs.statSync('packages/rocketchat-mentions-flextab/i18n/' + filename).size > 16) {
+			return 'i18n/' + filename;
+		}
+	}));
+	api.use('tap:i18n');
+	api.addFiles(tapi18nFiles);
+});
+
+Package.onTest(function(api) {
+
 });

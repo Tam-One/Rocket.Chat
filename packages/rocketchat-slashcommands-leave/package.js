@@ -14,3 +14,7 @@ Package.onUse(function(api) {
 	]);
 	api.addFiles('leave.coffee');
 });
+
+Package.onTest(function(api) {
+
+});

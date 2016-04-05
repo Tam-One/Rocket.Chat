@@ -91,24 +91,12 @@ Template.chatRoomItem.events
 			confirmButtonColor: '#DD6B55'
 			confirmButtonText: t('Yes_leave_it')
 			cancelButtonText: t('Cancel')
-			closeOnConfirm: false
+			closeOnConfirm: true
 			html: false
-		}, (isConfirm) ->
-			if isConfirm
-				Meteor.call 'leaveRoom', rid, (err) ->
-					if err
-						swal {
-							title: t('Warning')
-							text: t(err.reason)
-							type: 'warning'
-							html: false
-						}
+		}, ->
+			if FlowRouter.getRouteName() in ['channel', 'group', 'direct'] and Session.get('openedRoom') is rid
+				FlowRouter.go 'home'
 
-					else
-						swal.close()
-						if FlowRouter.getRouteName() in ['channel', 'group', 'direct'] and Session.get('openedRoom') is rid
-							FlowRouter.go 'home'
+			RoomManager.close rid
 
-						RoomManager.close rid
-			else
-				swal.close()
+			Meteor.call 'leaveRoom', rid

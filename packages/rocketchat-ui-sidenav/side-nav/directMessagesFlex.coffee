@@ -45,8 +45,6 @@ Template.directMessagesFlex.events
 
 	'keydown input[type="text"]': (e, instance) ->
 		Template.instance().error.set([])
-		if e.keyCode is 13
-			instance.$('.save-direct-message').click()
 
 	'click .save-direct-message': (e, instance) ->
 		err = SideNav.validate()

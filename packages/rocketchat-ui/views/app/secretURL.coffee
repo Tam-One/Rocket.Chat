@@ -21,4 +21,4 @@ Template.secretURL.onCreated ->
 			@hashIsValid.set false
 
 Template.secretURL.onRendered ->
-	$('#initial-page-loading').remove()
+	$('.page-loading').remove()

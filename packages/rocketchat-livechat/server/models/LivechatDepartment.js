@@ -9,19 +9,18 @@ class LivechatDepartment extends RocketChat.models._Base {
 
 	// FIND
 	findOneById(_id, options) {
-		const query = { _id: _id };
+		query = { _id: _id };
 
 		return this.findOne(query, options);
 	}
 
 	findByDepartmentId(_id, options) {
-		const query = { _id: _id };
-
+		query = { _id: _id };
 		return this.find(query, options);
 	}
 
 	createOrUpdateDepartment(_id, enabled, name, description, agents, extraData) {
-		agents = [].concat(agents);
+		var agents = [].concat(agents);
 
 		var record = {
 			enabled: enabled,
@@ -61,8 +60,7 @@ class LivechatDepartment extends RocketChat.models._Base {
 
 	// REMOVE
 	removeById(_id) {
-		const query = { _id: _id };
-
+		query = { _id: _id };
 		return this.remove(query);
 	}
 

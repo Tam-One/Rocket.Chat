@@ -1,70 +1,85 @@
 URL = Npm.require('url')
+http = Npm.require('http')
+https = Npm.require('https')
+zlib = Npm.require('zlib')
 querystring = Npm.require('querystring')
-request = HTTPInternals.NpmModules.request.module
-iconv = Npm.require('iconv-lite')
+
+gunzipSync = Meteor.wrapAsync zlib.gunzip.bind(zlib)
+inflateSync = Meteor.wrapAsync zlib.inflate.bind(zlib)
 
 OEmbed = {}
-
-# Detect encoding
-getCharset = (body) ->
-	binary = body.toString 'binary'
-	matches = binary.match /<meta\b[^>]*charset=["']?([\w\-]+)/i
-	if matches
-		return matches[1]
-	return 'utf-8'
-
-toUtf8 = (body) ->
-	return iconv.decode body, getCharset(body)
 
 getUrlContent = (urlObj, redirectCount = 5, callback) ->
 	if _.isString(urlObj)
 		urlObj = URL.parse urlObj
 
-	parsedUrl = _.pick urlObj, ['host', 'hash', 'pathname', 'protocol', 'port', 'query', 'search']
-
-	RocketChat.callbacks.run 'oembed:beforeGetUrlContent',
-		urlObj: urlObj
-		parsedUrl: parsedUrl
-
-	url = URL.format urlObj
 	opts =
-		url: url
-		strictSSL: !RocketChat.settings.get 'Allow_Invalid_SelfSigned_Certs'
-		gzip: true
-		maxRedirects: redirectCount
+		method: 'GET'
+		port: urlObj.port
+		hostname: urlObj.hostname
+		path: urlObj.path
+		rejectUnauthorized: !RocketChat.settings.get 'Allow_Invalid_SelfSigned_Certs'
 		headers:
 			'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'
 
-	headers = null
-	chunks = []
-	chunksTotalLength = 0
+	httpOrHttps = if urlObj.protocol is 'https:' then https else http
 
-	stream = request opts
-	stream.on 'response', (response) ->
+	parsedUrl = _.pick urlObj, ['host', 'hash', 'pathname', 'protocol', 'port', 'query', 'search']
+
+	RocketChat.callbacks.run 'oembed:beforeGetUrlContent',
+		requestOptions: opts
+		parsedUrl: parsedUrl
+
+	request = httpOrHttps.request opts, Meteor.bindEnvironment (response) ->
+		if response.statusCode in [301,302,307] and response.headers.location?
+			request.abort()
+			console.log response.headers.location
+
+			if redirectCount <= 0
+				return callback null, {parsedUrl: parsedUrl}
+
+			getUrlContent response.headers.location, --redirectCount, callback
+			return
+
 		if response.statusCode isnt 200
-			return stream.abort()
-		headers = response.headers
+			return callback null, {parsedUrl: parsedUrl}
 
-	stream.on 'data', (chunk) ->
-		chunks.push chunk
-		chunksTotalLength += chunk.length
-		if chunksTotalLength > 250000
-			stream.abort()
+		chunks = []
+		chunksTotalLength = 0
+		response.on 'data', (chunk) ->
+			chunks.push chunk
+			chunksTotalLength += chunk.length
+			if chunksTotalLength > 250000
+				request.abort()
 
-	stream.on 'end', Meteor.bindEnvironment ->
-		buffer = Buffer.concat(chunks)
+		response.on 'end', Meteor.bindEnvironment ->
+			buffer = Buffer.concat(chunks)
 
-		callback null, {
-			headers: headers
-			body: toUtf8 buffer
-			parsedUrl: parsedUrl
-		}
+			try
+				if response.headers['content-encoding'] is 'gzip'
+					buffer = gunzipSync buffer
+				else if response.headers['content-encoding'] is 'deflate'
+					buffer = inflateSync buffer
 
-	stream.on 'error', (error) ->
+			callback null, {
+				headers: response.headers
+				body: buffer.toString()
+				parsedUrl: parsedUrl
+			}
+
+		response.on 'error', (error) ->
+			callback null, {
+				error: error
+				parsedUrl: parsedUrl
+			}
+
+	request.on 'error', (error) ->
 		callback null, {
 			error: error
 			parsedUrl: parsedUrl
 		}
+
+	request.end()
 
 OEmbed.getUrlMeta = (url, withFragment) ->
 	getUrlContentSync = Meteor.wrapAsync getUrlContent
@@ -163,9 +178,7 @@ getRelevantMetaTags = (metaObj) ->
 OEmbed.RocketUrlParser = (message) ->
 	if Array.isArray message.urls
 		changed = false
-		message.urls.forEach (item) ->
-			if not /^https?:\/\//i.test item.url then return
-
+		for item in message.urls
 			data = OEmbed.getUrlMetaWithCache item.url
 
 			if data?

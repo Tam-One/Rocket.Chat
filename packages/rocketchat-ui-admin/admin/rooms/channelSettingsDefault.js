@@ -1,5 +1,3 @@
-/* globals ChatRoom */
-
 Template.channelSettingsDefault.helpers({
 	canMakeDefault() {
 		var room = ChatRoom.findOne(this.rid, { fields: { t: 1 }});
@@ -40,7 +38,7 @@ Template.channelSettingsDefault.events({
 	'click .save'(e, t) {
 		e.preventDefault();
 
-		Meteor.call('saveRoomSettings', this.rid, 'default', $('input[name=default]:checked').val(), (err/*, result*/) => {
+		Meteor.call('saveRoomSettings', this.rid, 'default', $('input[name=default]:checked').val(), (err, result) => {
 			if (err) {
 				if (err.error === 'invalid-room-type') {
 					return toastr.error(TAPi18n.__(err.reason, err.details.roomType));

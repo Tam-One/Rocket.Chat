@@ -1,8 +1,4 @@
 /* globals Template, emojione */
-
-var emojisByCategory;
-var toneList;
-
 Template.emojiPicker.helpers({
 	category() {
 		return Object.keys(emojisByCategory);
@@ -116,7 +112,7 @@ Template.emojiPicker.onCreated(function() {
 	};
 });
 
-toneList = {
+var toneList = {
 	'raised_hands': 1,
 	'clap': 1,
 	'wave': 1,
@@ -184,7 +180,7 @@ toneList = {
 	'spy': 1
 };
 
-emojisByCategory = {
+var emojisByCategory = {
 	'recent': [],
 	'symbols': [
 		'100',

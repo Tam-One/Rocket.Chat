@@ -1,6 +1,4 @@
-/* globals FastRender */
-
-FastRender.onAllRoutes(function(/*path*/) {
+FastRender.onAllRoutes(function(path) {
 	this.subscribe('settings');
-	this.subscribe('meteor.loginServiceConfiguration');
+	this.subscribe("meteor.loginServiceConfiguration");
 });

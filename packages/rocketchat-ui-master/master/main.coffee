@@ -234,7 +234,7 @@ Template.main.onRendered ->
 	else
 		$('html').removeClass "rtl"
 
-	$('#initial-page-loading').remove()
+	$('.page-loading').remove()
 
 	window.addEventListener 'focus', ->
 		Meteor.setTimeout ->

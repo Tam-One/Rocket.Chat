@@ -22,3 +22,7 @@ Package.onUse(function(api) {
 	api.addAssets('client/stylesheets/messageAttachments.less', 'server');
 	api.addFiles('client/stylesheets/loader.coffee', 'server');
 });
+
+Package.onTest(function(api) {
+
+});

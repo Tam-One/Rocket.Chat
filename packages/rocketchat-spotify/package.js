@@ -21,3 +21,7 @@ Package.onUse(function(api) {
 
 	api.addFiles('lib/spotify.coffee', ['server','client']);
 });
+
+Package.onTest(function(api) {
+
+});

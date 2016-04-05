@@ -17,3 +17,5 @@ Package.onUse(function(api) {
 
 	api.addFiles('sharedsecret.coffee', ['server','client']);
 });
+
+Package.onTest(function(api) {});

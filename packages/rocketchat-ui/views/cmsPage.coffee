@@ -8,9 +8,5 @@ Template.cmsPage.helpers
 	page: ->
 		return Template.instance().page.get()
 
-Template.cmsPage.events
-	'click .cms-page-close': ->
-		FlowRouter.go('/')
-
 Template.cmsPage.onRendered ->
-	$('#initial-page-loading').remove()
+	$('.page-loading').remove()

@@ -22,3 +22,5 @@ Package.onUse(function(api) {
 	api.addFiles('irc.server.coffee', 'server');
 	api.export(['Irc'], ['server']);
 });
+
+Package.onTest(function(api) {});

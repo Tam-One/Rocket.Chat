@@ -12,16 +12,20 @@ class LivechatDepartmentAgents extends RocketChat.models._Base {
 	}
 
 	saveAgent(agent) {
-		return this.upsert({
-			agentId: agent.agentId,
-			departmentId: agent.departmentId
-		}, {
-			$set: {
-				username: agent.username,
-				count: parseInt(agent.count),
-				order: parseInt(agent.order)
-			}
-		});
+		if (agent._id) {
+			return this.update({ _id: _id }, { $set: agent });
+		} else {
+			return this.upsert({
+				agentId: agent.agentId,
+				departmentId: agent.departmentId
+			}, {
+				$set: {
+					username: agent.username,
+					count: parseInt(agent.count),
+					order: parseInt(agent.order)
+				}
+			});
+		}
 	}
 
 	removeByDepartmentIdAndAgentId(departmentId, agentId) {
@@ -65,7 +69,7 @@ class LivechatDepartmentAgents extends RocketChat.models._Base {
 			return {
 				agentId: agent.agentId,
 				username: agent.username
-			};
+			}
 		} else {
 			return null;
 		}

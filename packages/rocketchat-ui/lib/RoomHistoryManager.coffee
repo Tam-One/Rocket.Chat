@@ -6,11 +6,11 @@
 	getRoom = (rid) ->
 		if not histories[rid]?
 			histories[rid] =
-				hasMore: new ReactiveVar true
-				hasMoreNext: new ReactiveVar false
-				isLoading: new ReactiveVar false
-				unreadNotLoaded: new ReactiveVar 0
-				firstUnread: new ReactiveVar
+				hasMore: ReactiveVar true
+				hasMoreNext: ReactiveVar false
+				isLoading: ReactiveVar false
+				unreadNotLoaded: ReactiveVar 0
+				firstUnread: ReactiveVar {}
 				loaded: 0
 
 		return histories[rid]

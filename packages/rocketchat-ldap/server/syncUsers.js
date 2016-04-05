@@ -1,8 +1,6 @@
-/* globals sync */
-
 Meteor.methods({
 	ldap_sync_users: function() {
-		const user = Meteor.user();
+		user = Meteor.user();
 		if (!user) {
 			throw new Meteor.Error('unauthorized', '[methods] ldap_sync_users -> Unauthorized');
 		}
@@ -15,11 +13,11 @@ Meteor.methods({
 			throw new Meteor.Error('LDAP_disabled');
 		}
 
-		const result = sync();
+		result = sync();
 
 		if (result === true) {
 			return {
-				message: 'Sync_success',
+				message: "Sync_success",
 				params: []
 			};
 		}

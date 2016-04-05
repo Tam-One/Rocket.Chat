@@ -1,14 +1,12 @@
-/* globals WebApp:true */
-
 WebApp = Package.webapp.WebApp;
-const Autoupdate = Package.autoupdate.Autoupdate;
+Autoupdate = Package.autoupdate.Autoupdate;
 
-WebApp.connectHandlers.use('/livechat/', (req, res/*, next*/) => {
+WebApp.connectHandlers.use('/livechat/', (req, res, next) => {
 	res.setHeader('content-type', 'text/html; charset=utf-8');
 
-	const head = Assets.getText('public/head.html');
+	head = Assets.getText('public/head.html');
 
-	const html = `<html>
+	html = `<html>
 		<head>
 			<link rel="stylesheet" type="text/css" class="__meteor-css__" href="/packages/rocketchat_livechat/public/livechat.css?_dc=${Autoupdate.autoupdateVersion}">
 			<script type="text/javascript">

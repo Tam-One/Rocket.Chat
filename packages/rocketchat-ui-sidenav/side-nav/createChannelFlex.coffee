@@ -1,4 +1,7 @@
 Template.createChannelFlex.helpers
+	tRoomMembers: ->
+		return t('Members')
+
 	selectedUsers: ->
 		return Template.instance().selectedUsers.get()
 
@@ -72,14 +75,6 @@ Template.createChannelFlex.events
 
 	'keydown input[type="text"]': (e, instance) ->
 		Template.instance().error.set([])
-
-	'keyup #channel-name': (e, instance) ->
-		if e.keyCode is 13
-			instance.$('#channel-members').focus()
-
-	'keydown #channel-members': (e, instance) ->
-		if $(e.currentTarget).val() is '' and e.keyCode is 13
-			instance.$('.save-channel').click()
 
 	'click .save-channel': (e, instance) ->
 		err = SideNav.validate()

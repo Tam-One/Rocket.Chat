@@ -13,14 +13,17 @@ Package.onUse(function(api) {
 		'underscore',
 		'webapp',
 		'rocketchat:file',
-		'rocketchat:lib',
-		'webapp-hashing'
+		'rocketchat:lib'
 	]);
 
 	api.addFiles('server/assets.coffee', 'server');
 });
 
 Npm.depends({
-	'image-size': '0.4.0',
-	'mime-types': '2.1.9'
+	"image-size": "0.4.0",
+	"mime-types": "2.1.9"
+});
+
+Package.onTest(function(api) {
+
 });

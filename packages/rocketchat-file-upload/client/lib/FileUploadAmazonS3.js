@@ -1,5 +1,4 @@
-/* globals FileUpload, FileUploadBase, Slingshot */
-
+/* globals FileUpload, FileUploadBase, Slingshot, Random */
 FileUpload.AmazonS3 = class FileUploadAmazonS3 extends FileUploadBase {
 	constructor(meta, file, data) {
 		super(meta, file, data);

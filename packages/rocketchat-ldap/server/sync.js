@@ -1,5 +1,3 @@
-/* globals slug:true, slugify, LDAP, getLdapUsername:true, getLdapUserUniqueID:true, getDataToSyncUserData:true, syncUserData:true, sync:true  */
-
 const logger = new Logger('LDAPSync', {});
 
 slug = function slug(text) {
@@ -158,7 +156,7 @@ sync = function sync() {
 	try {
 		ldap.connectSync();
 
-		const users = RocketChat.models.Users.findLDAPUsers();
+		users = RocketChat.models.Users.findLDAPUsers();
 
 		users.forEach(function(user) {
 			let ldapUser;
@@ -185,7 +183,7 @@ sync = function sync() {
 };
 
 let interval;
-let timeout;
+let timer;
 
 RocketChat.settings.get('LDAP_Sync_User_Data', function(key, value) {
 	Meteor.clearInterval(interval);
