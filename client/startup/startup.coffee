@@ -7,6 +7,7 @@ Meteor.startup ->
 
 	Session.setDefault('AvatarRandom', 0)
 	window.pymChild = new pym.Child({ id: 'chatapp-iframe-container'})
+
 	pymChild.onMessage 'loginUser', (user) ->
 	  user = JSON.parse(user)
 	  localStorage.setItem('Meteor.loginToken', user.authToken)
@@ -19,6 +20,10 @@ Meteor.startup ->
 	Tracker.autorun ->
     if Meteor.userId()
       pymChild.sendMessage('childLoggedIn', 'login ready')
+
+      subscriptions = ChatSubscription.find({open: true}, { fields: { unread: 1, alert: 1, rid: 1, t: 1, name: 1, ls: 1 } })
+      for subscription in subscriptions.fetch()
+        pymChild.sendMessage('unread', JSON.stringify(subscription))
 
 	pymChild.onMessage 'loadRoom', (username) ->
     FlowRouter.go 'private', {username: username}
