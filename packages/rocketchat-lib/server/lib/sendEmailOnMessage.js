@@ -73,7 +73,11 @@ RocketChat.callbacks.add('afterSaveMessage', function(message, room) {
 							to: email.address,
 							from: RocketChat.settings.get('From_Email'),
 							subject: emailSubject,
-							html: "&gt; " + message.html
+							html: "&gt; " + message.html,
+                            headers: {
+                                'X-Sender': JSON.stringify(message.u),
+                                'attachment': (message.attachments ? true : false)
+                            }
 						};
 
 						Email.send(email);
