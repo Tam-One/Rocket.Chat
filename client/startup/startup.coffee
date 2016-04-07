@@ -25,6 +25,8 @@ Meteor.startup ->
       for subscription in subscriptions.fetch()
         pymChild.sendMessage('unread', JSON.stringify(subscription))
 
+      pymChild.sendMessage('unread_ready', 'ready')
+
 	pymChild.onMessage 'loadRoom', (username) ->
     FlowRouter.go 'private', {username: username}
 
