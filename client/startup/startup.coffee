@@ -6,6 +6,9 @@ Meteor.startup ->
 	Meteor.subscribe("activeUsers")
 
 	Session.setDefault('AvatarRandom', 0)
+
+  # start custom logic
+
 	window.pymChild = new pym.Child({ id: 'chatapp-iframe-container'})
 
 	pymChild.onMessage 'loginUser', (user) ->
@@ -27,10 +30,26 @@ Meteor.startup ->
 
       pymChild.sendMessage('unread_ready', 'ready')
 
-	pymChild.onMessage 'loadRoom', (username) ->
-    FlowRouter.go 'private', {username: username}
+	pymChild.onMessage 'loadRoom', (name) ->
+    username = Meteor.user()?.username
+    unless username
+      return
+
+    query =
+				t: 'd'
+				usernames: $all: [name, username]
+
+    room = ChatRoom.findOne(query)
+    if not room?
+      Meteor.call 'createDirectMessage', name, (err) ->
+        if !err
+          FlowRouter.go 'private', {username: name}
+    else
+      FlowRouter.go 'private', {username: name}
 
 	pymChild.sendMessage('childLoaded', 'ready')
+
+  # end custom logic
 
 	window.lastMessageWindow = {}
 	window.lastMessageWindowHistory = {}
