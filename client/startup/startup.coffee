@@ -10,6 +10,7 @@ Meteor.startup ->
   # start custom logic
 
 	window.pymChild = new pym.Child({ id: 'chatapp-iframe-container'})
+	lastUser = null
 
 	pymChild.onMessage 'loginUser', (user) ->
 	  user = JSON.parse(user)
@@ -29,6 +30,15 @@ Meteor.startup ->
         pymChild.sendMessage('unread', JSON.stringify(subscription))
 
       pymChild.sendMessage('unread_ready', 'ready')
+
+	Deps.autorun ->
+		userId = Meteor.userId()
+		if userId
+			#console.log userId + " connected"
+		else if lastUser
+			pymChild.sendMessage('childDisconnected', 'disconnected')
+
+		lastUser = Meteor.user()
 
 	pymChild.onMessage 'loadRoom', (name) ->
     username = Meteor.user()?.username
