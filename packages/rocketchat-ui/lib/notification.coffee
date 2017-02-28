@@ -17,6 +17,7 @@
 				n = new Notification notification.title,
 					icon: notification.icon or getAvatarUrlFromUsername notification.payload.sender.username
 					body: _.stripTags(message.msg)
+					requireInteraction: true
 					silent: true
 
 				if notification.payload?.rid?
